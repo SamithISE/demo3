@@ -10,19 +10,19 @@ pipeline {
 
         stage('Build Java Application') {
             steps {
-                bat 'javac HelloWorld.java'
+                sh 'javac HelloWorld.java'
             }
         }
 
         stage('Run Java Program') {
             steps {
-                bat 'java HelloWorld'
+                sh 'java HelloWorld'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t ${env.IMAGE_NAME}:latest ."
+                sh "docker build -t ${env.IMAGE_NAME}:latest ."
             }
         }
 
@@ -34,21 +34,21 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
 
-                    bat "docker login -u %USER% -p %PASS%"
+                    sh "docker login -u %USER% -p %PASS%"
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat "docker push ${env.IMAGE_NAME}:latest"
+                sh "docker push ${env.IMAGE_NAME}:latest"
             }
         }
     }
 
     post {
         always {
-            bat 'docker logout'
+            sh 'docker logout'
         }
     }
 }
