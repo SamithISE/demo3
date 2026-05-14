@@ -2,53 +2,46 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIAL_ID = 'Docker'
-        IMAGE_NAME = 'samithhm/docker_image'
+        DOCKERHUB_CREDENTIALS = 'new'//give your credential name
+        IMAGE_NAME = 'samithhm/new'//give your image name
     }
 
     stages {
 
         stage('Build Java Application') {
             steps {
-                sh 'javac helloworld.java'
+                bat 'javac HelloWorld.java'
             }
         }
 
         stage('Run Java Program') {
             steps {
-                sh 'java helloworld'
+                bat 'java HelloWorld'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${env.IMAGE_NAME}:latest ."
+                bat 'docker build -t %IMAGE_NAME%:latest .'
             }
         }
 
         stage('Login to DockerHub') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: env.DOCKER_CREDENTIAL_ID,
-                    usernameVariable: 'USER',
-                    passwordVariable: 'PASS'
-                )]) {
+                credentialsId: 'new',//give your credentials mentioned above
+                usernameVariable: 'USER',
+                passwordVariable: 'PASS')]) {
 
-                    sh "docker login -u %USER% -p %PASS%"
+                    bat 'echo %PASS%| docker login -u %USER% --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push ${env.IMAGE_NAME}:latest"
+                bat 'docker push %IMAGE_NAME%:latest'
             }
-        }
-    }
-
-    post {
-        always {
-            sh 'docker logout'
         }
     }
 }
